@@ -62,6 +62,9 @@
     .game-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 12px 0; }
     .game button { font: inherit; font-size: 16px; min-height: 48px; padding: 10px 14px; background: #243e55; color: white; border: 1px solid #ffffff80; border-radius: 6px; cursor: pointer; touch-action: manipulation; }
     .game button:hover { background: #365874; }
+    .literacy h3 { margin: 28px 0 10px; font-size: 19px; line-height: 1.6; }
+    .literacy p, .literacy li { font-size: 16px; }
+    .literacy li + li { margin-top: 8px; }
   </style>
 </head>
 <body>
@@ -137,6 +140,38 @@
           <button type="button" data-blob="left">← 左</button><button type="button" data-blob="rotate">回転</button><button type="button" data-blob="right">右 →</button><button type="button" data-blob="down">↓ 下</button><button type="button" data-blob="drop">一気に落下</button>
         </div>
         <p>パソコン：盤面をクリックして矢印キーで移動・回転、スペースで落下。スマートフォン：ボタンで操作。玉が入口まで積み上がるとゲームオーバーです。</p>
+      </section>
+      <section class="details literacy" aria-labelledby="literacy-title" style="margin-top:32px">
+        <h2 id="literacy-title">ホームページを作るときの「情報リテラシー」</h2>
+        <p>情報リテラシーとは、情報をよく確かめて、安全に使い、相手に分かりやすく伝える力のことです。ホームページ（HP）は、世界中の人に見られる可能性があります。作る技術と一緒に、次のことも覚えておきましょう。</p>
+        <h3>1. 情報は「本当？」「いつの話？」と確かめる</h3>
+        <p>ネットの情報やAIの答えが、いつも正しいとは限りません。だれが書いたのか、いつ更新されたのか、もとの資料は何かを確認しましょう。分からないことは、想像で決めず「未定」と書きます。</p>
+        <p>例えばイベントなら、開催年・日時・集合場所を確認します。このページのイベントは架空なので、実際に参加できると誤解されないように書いています。</p>
+        <h3>2. 写真や文章は、自由に使えるとは限らない</h3>
+        <p>検索で見つけた写真や文章を、そのまま自分のHPに使ってよいとは限りません。自分で作ったものを使うか、使ってよい条件を確認しましょう。「出典を書けば何でも使える」というわけではありません。</p>
+        <p>素材を使うときは、作者名の表示や加工のルールも確認します。友達が写った写真なら、公開してよいか本人にも聞きましょう。</p>
+        <h3>3. 個人情報とパスワードを守る</h3>
+        <p>住所、電話番号、学校や毎日の行動が分かる情報を、うっかり載せないようにしましょう。写真の背景や位置情報にも注意します。他の人の情報も、勝手に公開しません。</p>
+        <p>パスワードやサービスの秘密のキーは、HTMLやGitHubに書かないでください。画面に表示されなくても、ページの中身から読めることがあります。一度公開すると、コピーが残る場合もあります。</p>
+        <h3>4. いろいろな人が読みやすいページにする</h3>
+        <p>文字を十分に大きくして、背景との色の差をつけます。色だけで意味を伝えず、「停止中」などの言葉も添えましょう。見出しで内容を整理し、画像には何が写っているかの説明を付けます。</p>
+        <p>スマートフォンの縦画面でも読めるか、ボタンを押しやすいか、キーボードでも操作できるかを確認しましょう。</p>
+        <h3>5. HTML・CSS・JavaScriptの役割を知る</h3>
+        <ul>
+          <li><strong>HTML：</strong>見出しや文章など、ページの内容と構造を作ります。</li>
+          <li><strong>CSS：</strong>文字の色・大きさや、並べ方を整えます。</li>
+          <li><strong>JavaScript：</strong>ボタンへの反応や、このページのパズルの動きを作ります。</li>
+        </ul>
+        <p>知らないコードをコピーするときは、何をするものか確かめましょう。AIに作ってもらったコードも、内容と動作を自分で確認することが大切です。</p>
+        <h3>6. 公開する前に、見る人の立場でチェック</h3>
+        <ul>
+          <li>内容は正しく、古くなっていませんか？</li>
+          <li>他の人の作品や個人情報を勝手に載せていませんか？</li>
+          <li>スマートフォンでも文字が読めて、横にはみ出しませんか？</li>
+          <li>リンクやボタンは、説明どおりに動きますか？</li>
+          <li>間違えたときに直せるよう、元のファイルを保存しましたか？</li>
+        </ul>
+        <p>公開したあとも、ときどき見直しましょう。困ったときや公開してよいか迷ったときは、先生や保護者など、信頼できる大人に相談してください。</p>
       </section>
     </main>
     <div class="sea" aria-hidden="true"></div>
