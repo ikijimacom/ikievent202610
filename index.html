@@ -27,6 +27,20 @@
     .fiction { margin: 0 0 20px; font-size: 16px; }
     main, dd { min-width: 0; overflow-wrap: anywhere; }
     small { font-size: 16px; }
+    .autumn-scene { position: relative; height: 170px; max-width: 740px; margin: 28px 0 0; overflow: hidden; border-bottom: 1px solid #ffffff45; }
+    .scene-moon { position: absolute; width: 76px; height: 76px; border-radius: 50%; background: #fff; right: 20%; top: 8px; box-shadow: 0 0 45px #ffffff20; }
+    .rabbit { position: absolute; bottom: 0; left: 30%; width: 70px; height: 68px; border-radius: 55% 55% 30% 30%; background: #fff; }
+    .rabbit::before { content: ""; position: absolute; width: 47px; height: 44px; background: #fff; border-radius: 50%; top: -25px; left: 20px; }
+    .rabbit::after { content: ""; position: absolute; width: 22px; height: 22px; background: #fff; border-radius: 50%; left: -10px; bottom: 9px; }
+    .ear { position: absolute; top: -65px; width: 13px; height: 53px; background: #fff; border-radius: 70% 70% 20% 20%; transform: rotate(-12deg); left: 30px; }
+    .ear + .ear { left: 48px; transform: rotate(12deg); }
+    .grass { position: absolute; bottom: 0; width: 2px; height: 100px; background: #fff; transform-origin: bottom; }
+    .grass::before { content: ""; position: absolute; top: -22px; left: -5px; width: 12px; height: 45px; border-radius: 80% 10% 80% 10%; background: #fff; }
+    .grass:nth-of-type(3) { left: 10%; transform: rotate(-18deg); }
+    .grass:nth-of-type(4) { left: 14%; height: 120px; transform: rotate(12deg); }
+    .grass:nth-of-type(5) { right: 10%; transform: rotate(20deg); }
+    .grass:nth-of-type(6) { right: 15%; height: 80px; transform: rotate(-10deg); }
+    .scene-caption { margin: 12px 0 0; font-size: 16px; }
     .details { max-width: 740px; padding: 30px 36px; border: 1px solid #ffffff26; border-radius: 4px; background: #0a1c29b8; }
     h2 { margin: 0 0 18px; font-size: 17px; font-weight: 500; letter-spacing: .14em; }
     dl { margin: 0; }
@@ -61,6 +75,13 @@
         <p class="eyebrow">澄んだ秋の夜、壱岐の海辺で星めぐり。</p>
         <h1>秋の星空観察会</h1>
         <p class="intro">ひんやりとした潮風、静かに寄せる波の音。<br>秋の澄んだ夜空を見上げて、きらめく星を探しませんか。<br>あたたかい上着に包まれて、深まる秋を感じるひとときを。</p>
+        <div class="autumn-scene" role="img" aria-label="秋の月を見上げる白いうさぎと、風にそよぐすすきのシルエット">
+          <div class="scene-moon" aria-hidden="true"></div>
+          <div class="rabbit" aria-hidden="true"><span class="ear"></span><span class="ear"></span></div>
+          <span class="grass" aria-hidden="true"></span><span class="grass" aria-hidden="true"></span>
+          <span class="grass" aria-hidden="true"></span><span class="grass" aria-hidden="true"></span>
+        </div>
+        <p class="scene-caption">うさぎも見上げる、秋の夜空。すすきと月に、季節を感じて。</p>
       </header>
       <section class="details" aria-labelledby="details-title">
         <h2 id="details-title">開催のご案内</h2>
