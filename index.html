@@ -57,8 +57,8 @@
     @media (max-width: 600px) { main { padding: 24px 20px 48px; } .moon { width: 32px; height: 32px; top: 24px; right: 20px; } .brand { max-width: calc(100% - 48px); letter-spacing: .1em; } .hero { padding: 20px 0 32px; } h1 { font-size: clamp(30px, 8vw, 44px); letter-spacing: .04em; } .intro { font-size: 16px; } .highlight, .details { padding: 20px; } .row { grid-template-columns: 1fr; gap: 6px; } .eyebrow { font-size: 16px; letter-spacing: .08em; } }
 
     .game { margin-top: 32px; }
-    #game-board { display: block; width: min(100%, 240px); height: auto; margin: 20px auto; background: #050e1a; border: 2px solid #ffffff80; }
-    #game-board:focus-visible, .game button:focus-visible { outline: 3px solid white; outline-offset: 4px; }
+    #game-board, #blob-board { display: block; width: min(100%, 240px); height: auto; margin: 20px auto; background: #050e1a; border: 2px solid #ffffff80; }
+    #game-board:focus-visible, #blob-board:focus-visible, .game button:focus-visible { outline: 3px solid white; outline-offset: 4px; }
     .game-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 12px 0; }
     .game button { font: inherit; font-size: 16px; min-height: 48px; padding: 10px 14px; background: #243e55; color: white; border: 1px solid #ffffff80; border-radius: 6px; cursor: pointer; touch-action: manipulation; }
     .game button:hover { background: #365874; }
@@ -123,6 +123,20 @@
           <button type="button" data-action="drop">一気に落下</button>
         </div>
         <p>パソコン：盤面をクリックして、← → で移動、↑ で回転、↓ で下降、スペースで落下。スマートフォン：上のボタンで操作できます。</p>
+      </section>
+      <section class="details game" aria-labelledby="blob-title" style="margin-top:32px">
+        <h2 id="blob-title">星色つなぎパズル</h2>
+        <p>2個ずつ落ちる星色の玉を、同じ色で上下左右に4つ以上つなげて消しましょう。消えたあとに玉が落ちて、続けて消えると連鎖になります。</p>
+        <p id="blob-status" role="status">「スタート」で開始できます。</p>
+        <p>スコア：<span id="blob-score">0</span> · 最大連鎖：<span id="blob-chain">0</span></p>
+        <canvas id="blob-board" width="240" height="480" tabindex="0" aria-label="星色つなぎパズルの盤面。左右キーで移動、上キーで回転、下キーで下降、スペースで落下。"></canvas>
+        <div class="game-controls">
+          <button type="button" data-blob="start">スタート / やり直す</button><button type="button" data-blob="pause">一時停止 / 再開</button>
+        </div>
+        <div class="game-controls">
+          <button type="button" data-blob="left">← 左</button><button type="button" data-blob="rotate">回転</button><button type="button" data-blob="right">右 →</button><button type="button" data-blob="down">↓ 下</button><button type="button" data-blob="drop">一気に落下</button>
+        </div>
+        <p>パソコン：盤面をクリックして矢印キーで移動・回転、スペースで落下。スマートフォン：ボタンで操作。玉が入口まで積み上がるとゲームオーバーです。</p>
       </section>
     </main>
     <div class="sea" aria-hidden="true"></div>
@@ -217,6 +231,42 @@
       document.addEventListener('visibilitychange',()=>{if(document.hidden && running && !paused) pause();});
       board=emptyBoard(); draw();
     })();
+  </script>
+  <script>
+  (() => {
+    const canvas=document.getElementById('blob-board'), ctx=canvas.getContext('2d');
+    if(!ctx) return;
+    const status=document.getElementById('blob-status'), scoreEl=document.getElementById('blob-score'), chainEl=document.getElementById('blob-chain');
+    const colors=['#ff8fa8','#80caff','#ffe181','#9de2ad'];
+    const directions=[[0,-1],[1,0],[0,1],[-1,0]];
+    let board, pair, running=false, paused=false, score=0, best=0, timer;
+    const empty=()=>Array.from({length:12},()=>Array(6).fill(0));
+    function cells(p=pair){const [dx,dy]=directions[p.r];return [[p.x,p.y,p.a],[p.x+dx,p.y+dy,p.b]];}
+    function fits(p){return cells(p).every(([x,y])=>x>=0&&x<6&&y>=0&&y<12&&!board[y][x]);}
+    function spawn(){pair={x:2,y:1,r:0,a:1+Math.floor(Math.random()*4),b:1+Math.floor(Math.random()*4)};if(!fits(pair)){running=false;clearInterval(timer);status.textContent='ゲームオーバー！「やり直す」で再挑戦できます。';}}
+    function gravity(){for(let x=0;x<6;x++){const col=board.map(row=>row[x]).filter(Boolean);for(let y=11;y>=0;y--)board[y][x]=col.pop()||0;}}
+    function groups(){const seen=new Set(), remove=[];for(let y=0;y<12;y++)for(let x=0;x<6;x++){
+      const key=y*6+x;if(!board[y][x]||seen.has(key))continue;
+      const color=board[y][x], group=[[x,y]];seen.add(key);
+      for(let i=0;i<group.length;i++){const [cx,cy]=group[i];for(const [dx,dy] of directions){const nx=cx+dx,ny=cy+dy,k=ny*6+nx;if(nx>=0&&nx<6&&ny>=0&&ny<12&&!seen.has(k)&&board[ny][nx]===color){seen.add(k);group.push([nx,ny]);}}}
+      if(group.length>=4)remove.push(...group);
+    }return remove;}
+    function settle(){gravity();let chain=0;while(true){const remove=groups();if(!remove.length)break;chain++;score+=remove.length*10*chain;remove.forEach(([x,y])=>board[y][x]=0);gravity();}best=Math.max(best,chain);scoreEl.textContent=score;chainEl.textContent=best;status.textContent=chain?`${chain}連鎖！ 同じ色をつなげましょう。`:'プレイ中：同じ色を4つ以上つなげましょう。';spawn();}
+    function orb(x,y,color){ctx.fillStyle=colors[color-1];ctx.beginPath();ctx.arc(x*40+20,y*40+20,17,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffffffaa';ctx.beginPath();ctx.arc(x*40+14,y*40+13,4,0,Math.PI*2);ctx.fill();}
+    function draw(){ctx.clearRect(0,0,240,480);ctx.strokeStyle='#ffffff10';for(let x=0;x<=6;x++){ctx.beginPath();ctx.moveTo(x*40,0);ctx.lineTo(x*40,480);ctx.stroke();}for(let y=0;y<=12;y++){ctx.beginPath();ctx.moveTo(0,y*40);ctx.lineTo(240,y*40);ctx.stroke();}board.forEach((row,y)=>row.forEach((v,x)=>{if(v)orb(x,y,v);}));if(pair)cells().forEach(([x,y,c])=>orb(x,y,c));}
+    function lock(){cells().forEach(([x,y,c])=>board[y][x]=c);settle();}
+    function step(){if(!running||paused)return;const next={...pair,y:pair.y+1};if(fits(next))pair=next;else lock();draw();}
+    function pause(){if(!running)return;paused=!paused;status.textContent=paused?'一時停止中です。':'プレイ中：同じ色を4つ以上つなげましょう。';}
+    function action(name){if(name==='start'){clearInterval(timer);board=empty();score=best=0;scoreEl.textContent=chainEl.textContent='0';running=true;paused=false;status.textContent='プレイ中：同じ色を4つ以上つなげましょう。';spawn();draw();timer=setInterval(step,700);return;}if(name==='pause'){pause();return;}if(!running||paused)return;
+      if(name==='left'||name==='right'){const next={...pair,x:pair.x+(name==='left'?-1:1)};if(fits(next))pair=next;}
+      else if(name==='rotate'){for(const dx of [0,-1,1]){const next={...pair,r:(pair.r+1)%4,x:pair.x+dx};if(fits(next)){pair=next;break;}}}
+      else if(name==='down')step();else if(name==='drop'){while(fits({...pair,y:pair.y+1}))pair.y++;lock();}draw();
+    }
+    document.querySelectorAll('[data-blob]').forEach(button=>button.addEventListener('click',()=>action(button.dataset.blob)));
+    canvas.addEventListener('keydown',event=>{const map={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'rotate',ArrowDown:'down',' ':'drop',p:'pause',P:'pause'};if(map[event.key]){event.preventDefault();action(map[event.key]);}});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden&&running&&!paused)pause();});
+    board=empty();draw();
+  })();
   </script>
 </body>
 </html>
