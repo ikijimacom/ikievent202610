@@ -56,6 +56,12 @@
     .sea { position: absolute; bottom: 0; left: -10%; width: 120%; height: 140px; border-radius: 50% 50% 0 0; background: #071924; opacity: .6; }
     @media (max-width: 600px) { main { padding: 24px 20px 48px; } .moon { width: 32px; height: 32px; top: 24px; right: 20px; } .brand { max-width: calc(100% - 48px); letter-spacing: .1em; } .hero { padding: 20px 0 32px; } h1 { font-size: clamp(30px, 8vw, 44px); letter-spacing: .04em; } .intro { font-size: 16px; } .highlight, .details { padding: 20px; } .row { grid-template-columns: 1fr; gap: 6px; } .eyebrow { font-size: 16px; letter-spacing: .08em; } }
 
+    .game { margin-top: 32px; }
+    #game-board { display: block; width: min(100%, 240px); height: auto; margin: 20px auto; background: #050e1a; border: 2px solid #ffffff80; }
+    #game-board:focus-visible, .game button:focus-visible { outline: 3px solid white; outline-offset: 4px; }
+    .game-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 12px 0; }
+    .game button { font: inherit; font-size: 16px; min-height: 48px; padding: 10px 14px; background: #243e55; color: white; border: 1px solid #ffffff80; border-radius: 6px; cursor: pointer; touch-action: manipulation; }
+    .game button:hover { background: #365874; }
   </style>
 </head>
 <body>
@@ -99,9 +105,118 @@
         <p>晩秋の海辺は、日が暮れると冷え込みます。あたたかい上着やひざ掛けで、潮風への備えを。足元を照らす小さなライトがあると便利です。</p>
       </section>
       <p class="note">※ このページは架空のイベントの告知です。実際の開催・募集はありません。問い合わせ先はサンプルで、連絡にはご利用いただけません。</p>
+      <section class="details game" aria-labelledby="game-title" style="margin-top: 32px">
+        <h2 id="game-title">星待ちのミニテトリス</h2>
+        <p>横一列をそろえて消す、落ちものパズル。星を待つ気分で遊んでみましょう。</p>
+        <p id="game-status" role="status">「スタート」で開始できます。</p>
+        <p>スコア：<span id="game-score">0</span></p>
+        <canvas id="game-board" width="240" height="480" tabindex="0" aria-label="テトリスの盤面。左右キーで移動、上キーで回転、下キーで下降、スペースで一気に落下。">このゲームには Canvas 対応ブラウザが必要です。</canvas>
+        <div class="game-controls">
+          <button type="button" data-action="start">スタート / やり直す</button>
+          <button type="button" data-action="pause">一時停止 / 再開</button>
+        </div>
+        <div class="game-controls">
+          <button type="button" data-action="left" aria-label="左へ移動">← 左</button>
+          <button type="button" data-action="rotate">回転</button>
+          <button type="button" data-action="right" aria-label="右へ移動">右 →</button>
+          <button type="button" data-action="down">↓ 下</button>
+          <button type="button" data-action="drop">一気に落下</button>
+        </div>
+        <p>パソコン：盤面をクリックして、← → で移動、↑ で回転、↓ で下降、スペースで落下。スマートフォン：上のボタンで操作できます。</p>
+      </section>
     </main>
     <div class="sea" aria-hidden="true"></div>
   </div>
   <footer>秋の星空観察会 · 架空のイベント</footer>
+  <script>
+    (() => {
+      const canvas = document.getElementById('game-board');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      const status = document.getElementById('game-status');
+      const scoreText = document.getElementById('game-score');
+      const shapes = [ [[1,1,1,1]], [[1,1],[1,1]], [[0,1,0],[1,1,1]], [[0,1,1],[1,1,0]], [[1,1,0],[0,1,1]], [[1,0,0],[1,1,1]], [[0,0,1],[1,1,1]] ];
+      const colors = ['#75d9ed','#ffe195','#c7a1ff','#9cdbab','#ef9eae','#91b6ff','#ffc08b'];
+      let board = [], piece, score = 0, running = false, paused = false, timer;
+      const emptyBoard = () => Array.from({length:20}, () => Array(10).fill(0));
+      function fits(matrix, x, y) {
+        return matrix.every((row, dy) => row.every((v, dx) => !v || (x+dx >= 0 && x+dx < 10 && y+dy >= 0 && y+dy < 20 && !board[y+dy][x+dx])));
+      }
+      function spawn() {
+        const id = Math.floor(Math.random()*shapes.length);
+        piece = {matrix: shapes[id].map(row => [...row]), x:3, y:0, color:id+1};
+        if (!fits(piece.matrix,piece.x,piece.y)) {
+          running = false; clearInterval(timer);
+          status.textContent = 'ゲームオーバー！「やり直す」で再挑戦できます。';
+        }
+      }
+      function paint(matrix, x, y, color) {
+        matrix.forEach((row,dy) => row.forEach((v,dx) => {
+          if (!v) return;
+          ctx.fillStyle = colors[(color || v)-1];
+          ctx.fillRect((x+dx)*24+1,(y+dy)*24+1,22,22);
+          ctx.fillStyle = '#ffffff35';
+          ctx.fillRect((x+dx)*24+3,(y+dy)*24+3,18,3);
+        }));
+      }
+      function draw() {
+        ctx.clearRect(0,0,240,480);
+        ctx.strokeStyle = '#ffffff10';
+        for(let x=0;x<=10;x++){ctx.beginPath();ctx.moveTo(x*24,0);ctx.lineTo(x*24,480);ctx.stroke();}
+        for(let y=0;y<=20;y++){ctx.beginPath();ctx.moveTo(0,y*24);ctx.lineTo(240,y*24);ctx.stroke();}
+        paint(board,0,0);
+        if (piece) paint(piece.matrix,piece.x,piece.y,piece.color);
+      }
+      function lock() {
+        piece.matrix.forEach((row,dy) => row.forEach((v,dx) => {if(v) board[piece.y+dy][piece.x+dx]=piece.color;}));
+        const remaining = board.filter(row => row.some(v => !v));
+        const lines = 20-remaining.length;
+        board = [...Array.from({length:lines}, () => Array(10).fill(0)), ...remaining];
+        score += [0,100,300,500,800][lines]; scoreText.textContent = score;
+        spawn();
+      }
+      function step() {
+        if (!running || paused) return;
+        if (fits(piece.matrix,piece.x,piece.y+1)) piece.y++;
+        else lock();
+        draw();
+      }
+      function pause() {
+        if(!running) return;
+        paused = !paused;
+        status.textContent = paused ? '一時停止中です。' : 'プレイ中：横一列をそろえましょう。';
+      }
+      function action(name) {
+        if(name === 'start') {
+          clearInterval(timer); board=emptyBoard(); score=0; scoreText.textContent='0'; running=true; paused=false;
+          status.textContent='プレイ中：横一列をそろえましょう。'; spawn(); draw();
+          timer=setInterval(step,650); return;
+        }
+        if(name === 'pause') {pause();return;}
+        if(!running || paused) return;
+        if(name === 'left' || name === 'right') {
+          const dx=name==='left' ? -1 : 1;
+          if(fits(piece.matrix,piece.x+dx,piece.y)) piece.x+=dx;
+        } else if(name === 'rotate') {
+          const rotated=piece.matrix[0].map((_,i) => piece.matrix.map(row=>row[i]).reverse());
+          for(const offset of [0,-1,1,-2,2]) {
+            if(fits(rotated,piece.x+offset,piece.y)){piece.matrix=rotated;piece.x+=offset;break;}
+          }
+        } else if(name === 'down') {step();}
+        else if(name === 'drop') {
+          while(fits(piece.matrix,piece.x,piece.y+1)) piece.y++;
+          lock();
+        }
+        draw();
+      }
+      document.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('click',()=>action(button.dataset.action)));
+      canvas.addEventListener('keydown',event=>{
+        const keys={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'rotate',ArrowDown:'down',' ':'drop',p:'pause',P:'pause'};
+        if(keys[event.key]) {event.preventDefault();action(keys[event.key]);}
+      });
+      document.addEventListener('visibilitychange',()=>{if(document.hidden && running && !paused) pause();});
+      board=emptyBoard(); draw();
+    })();
+  </script>
 </body>
 </html>
