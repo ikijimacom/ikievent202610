@@ -11,7 +11,7 @@
     body { margin: 0; background: #091723; color: var(--ink); font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; line-height: 1.8; }
     .sky { position: relative; overflow: hidden; min-height: 100vh; background: radial-gradient(ellipse at 75% 15%, #233e50 0, transparent 48%), linear-gradient(#091420, #102c3a); }
     .sky::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .7; background-image: radial-gradient(1px 1px at 12% 12%, white 99%, transparent), radial-gradient(2px 2px at 80% 23%, #fff5d5 99%, transparent), radial-gradient(1px 1px at 46% 8%, white 99%, transparent), radial-gradient(1px 1px at 63% 39%, white 99%, transparent), radial-gradient(1px 1px at 22% 44%, white 99%, transparent); background-size: 390px 340px; }
-    .moon { position: absolute; top: 76px; right: max(8%, 24px); width: 66px; height: 66px; border-radius: 50%; background: #f3e2b7; box-shadow: 0 0 65px #eedcaa22; }
+    .moon { position: absolute; top: 76px; right: max(8%, 24px); width: 66px; height: 66px; border-radius: 50%; background: transparent; box-shadow: inset 14px -6px 0 0 #fff; transform: rotate(-20deg); }
     main { position: relative; z-index: 1; max-width: 1000px; margin: auto; padding: 48px 32px 100px; }
     .brand { margin: 0; color: var(--gold); font-size: 12px; letter-spacing: .22em; }
     .hero { padding: 24px 0 40px; }
@@ -28,7 +28,7 @@
     main, dd { min-width: 0; overflow-wrap: anywhere; }
     small { font-size: 16px; }
     .autumn-scene { position: relative; height: 170px; max-width: 740px; margin: 28px 0 0; overflow: hidden; border-bottom: 1px solid #ffffff45; }
-    .scene-moon { position: absolute; width: 76px; height: 76px; border-radius: 50%; background: #fff; right: 20%; top: 8px; box-shadow: 0 0 45px #ffffff20; }
+    .scene-moon { position: absolute; width: 76px; height: 76px; border-radius: 50%; background: transparent; right: 20%; top: 8px; box-shadow: inset 18px -8px 0 0 #fff; transform: rotate(-20deg); }
     .rabbit { position: absolute; bottom: 0; left: 30%; width: 70px; height: 68px; border-radius: 55% 55% 30% 30%; background: #fff; }
     .rabbit::before { content: ""; position: absolute; width: 47px; height: 44px; background: #fff; border-radius: 50%; top: -25px; left: 20px; }
     .rabbit::after { content: ""; position: absolute; width: 22px; height: 22px; background: #fff; border-radius: 50%; left: -10px; bottom: 9px; }
@@ -75,7 +75,7 @@
         <p class="eyebrow">澄んだ秋の夜、壱岐の海辺で星めぐり。</p>
         <h1>秋の星空観察会</h1>
         <p class="intro">ひんやりとした潮風、静かに寄せる波の音。<br>秋の澄んだ夜空を見上げて、きらめく星を探しませんか。<br>あたたかい上着に包まれて、深まる秋を感じるひとときを。</p>
-        <div class="autumn-scene" role="img" aria-label="秋の月を見上げる白いうさぎと、風にそよぐすすきのシルエット">
+        <div class="autumn-scene" role="img" aria-label="秋の三日月を見上げる白いうさぎと、風にそよぐすすきのシルエット">
           <div class="scene-moon" aria-hidden="true"></div>
           <div class="rabbit" aria-hidden="true"><span class="ear"></span><span class="ear"></span></div>
           <span class="grass" aria-hidden="true"></span><span class="grass" aria-hidden="true"></span>
